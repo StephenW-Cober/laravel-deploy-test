@@ -1,0 +1,24 @@
+stages:
+  - test
+  - deploy
+test:
+  before_script:
+    - cd src
+  script:
+  - powershell -command "copy .env.jenkins .env"
+  - powershell -command "php JenkinsDBClean.php"
+  - powershell -command "composer install"
+  - powershell -command "composer dumpautoload"
+  - powershell -command "php artisan migrate"
+  - vendor\bin\phpunit
+  allow_failure: true
+
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploy to staging server"
+  environment:
+    name: octodevsandbox
+    url: http://octodevsandbox.cober.com
+  only:
+  - master
